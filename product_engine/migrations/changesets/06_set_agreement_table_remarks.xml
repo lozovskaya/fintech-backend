@@ -1,0 +1,75 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <changeSet author="alozovskaya" id="setAgreementTableRemarks">  
+        <setTableRemarks catalogName="agreement"  
+                remarks="Информация о кредитном договоре"  
+                schemaName="public"  
+                tableName="agreement"/>
+
+        <setColumnRemarks catalogName="agreement"   
+                columnDataType="int"  
+                columnName="product_id"  
+                remarks="Продукт, к которому относится договор"  
+                schemaName="public"  
+                tableName="agreement"/>
+                
+        <setColumnRemarks catalogName="agreement"   
+                columnDataType="int"  
+                columnName="client_id"  
+                remarks="Информация о клиенте"  
+                schemaName="public"  
+                tableName="agreement"/>
+                
+        <setColumnRemarks catalogName="agreement"   
+                columnDataType="int"  
+                columnName="term"  
+                remarks="Конкретные условия по продукту для данного клиента: срок кредита"  
+                schemaName="public"  
+                tableName="agreement"/>
+                
+        <setColumnRemarks catalogName="agreement"   
+                columnDataType="decimal"  
+                columnName="principal"  
+                remarks="Конкретные условия по продукту для данного клиента: сумма кредита"  
+                schemaName="public"  
+                tableName="agreement"/>
+                
+        <setColumnRemarks catalogName="agreement"   
+                columnDataType="decimal"
+                columnName="interest_rate"  
+                remarks="Конкретные условия по продукту для данного клиента: процентная ставка"  
+                schemaName="public"  
+                tableName="agreement"/>
+                
+        <setColumnRemarks catalogName="agreement"   
+                columnDataType="decimal"  
+                columnName="origination_amount"  
+                remarks="Конкретные условия по продукту для данного клиента: сумма комиссий"  
+                schemaName="public"  
+                tableName="agreement"/>
+                
+        <setColumnRemarks catalogName="agreement"   
+                columnDataType="timestamp"  
+                columnName="activation_date"  
+                remarks="Дата и время активации договора"  
+                schemaName="public"  
+                tableName="agreement"/>
+                
+        <setColumnRemarks catalogName="agreement"   
+                columnDataType="varchar"  
+                columnName="status"  
+                remarks="Статус договора (новый, активированный, закрытый)"  
+                schemaName="public"  
+                tableName="agreement"/>
+
+    </changeSet>
+    
+</databaseChangeLog>
