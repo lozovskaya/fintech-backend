@@ -19,6 +19,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      
   pgadmin:
     container_name: "fintech-pgadmin"
     image: dpage/pgadmin4
