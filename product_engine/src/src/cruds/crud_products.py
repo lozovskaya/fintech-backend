@@ -30,7 +30,7 @@ def create_product(db: Session, product: ProductModel) -> Product:
 
 
 def delete_product(db: Session, product_code: str) -> Product:
-    product = get_product_by_internal_code(product_code)
+    product = get_product_by_internal_code(db, product_code)
     db.delete(product)
     db.commit()
     db.close()
