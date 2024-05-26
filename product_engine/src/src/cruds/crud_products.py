@@ -13,6 +13,9 @@ def get_product_by_internal_code(db: Session, product_code: str) -> Product:
 def get_all_products(db: Session) -> List[Product]:
     return db.query(Product).all()
 
+def get_product_by_id(db: Session, product_id: int) -> Product:
+    return db.query(Product).filter(Product.product_id == product_id).first()
+
 
 def create_product(db: Session, product: ProductModel) -> Product:
     try:

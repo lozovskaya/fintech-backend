@@ -25,6 +25,14 @@ def get_product(product_code: str, db: Session = Depends(get_db)) -> ProductMode
         raise HTTPException(status_code=404, detail="Product not found")
     return product
 
+# Get a product by id
+@router.get("/id/{product_id}", response_model=ProductModel)
+def get_product_by_id(product_id: int, db: Session = Depends(get_db)) -> ProductModel:
+    product = crud_products.get_product_by_id(db, product_id)
+    if product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
+
 # Creates a new product
 @router.post("/", response_model=None)
 def create_product(product: ProductModel, db: Session = Depends(get_db)) -> None:

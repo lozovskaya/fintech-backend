@@ -1,0 +1,62 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <changeSet author="alozovskaya" id="setApplicationTableRemarks">  
+        <setTableRemarks catalogName="application"  
+                remarks="Заявки на кредит"  
+                schemaName="public"  
+                tableName="application"/>
+
+        <setColumnRemarks catalogName="application"   
+                columnDataType="int"  
+                columnName="client_id"  
+                remarks="Уникальный ID клиента"  
+                schemaName="public"  
+                tableName="application"/>
+                
+        <setColumnRemarks catalogName="application"   
+                columnDataType="int"  
+                columnName="product_id"  
+                remarks="Уникальный ID продукта"  
+                schemaName="public"  
+                tableName="application"/>
+                
+        <setColumnRemarks catalogName="application"   
+                columnDataType="int"  
+                columnName="term"  
+                remarks="Желаемый срок кредита"  
+                schemaName="public"  
+                tableName="application"/>
+                
+        <setColumnRemarks catalogName="application"   
+                columnDataType="decimal"  
+                columnName="disbursement_amount"  
+                remarks="Желаемая сумма кредита"  
+                schemaName="public"  
+                tableName="application"/>
+                
+                
+        <setColumnRemarks catalogName="application"   
+                columnDataType="decimal"  
+                columnName="interest"  
+                remarks="Желаемая процентная ставка"  
+                schemaName="public"  
+                tableName="application"/>
+
+                
+        <setColumnRemarks catalogName="application"   
+                columnDataType="varchar"  
+                columnName="status"  
+                remarks="Статус заявки"  
+                schemaName="public"  
+                tableName="application"/>
+    </changeSet>
+    
+</databaseChangeLog>
