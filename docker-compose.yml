@@ -1,0 +1,112 @@
+version: "3"
+
+services:
+  # Databases:
+  postgresql:
+    container_name: "fintech-postgresql"
+    image: postgres:15.5
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_MULTIPLE_DATABASES: product_engine, origination
+    ports:
+      - "5432:5432"
+    networks:
+      - fintech-network
+    volumes:
+      - ./tools/database-dev/configs/create-multiple-db-with-users.sh:/docker-entrypoint-initdb.d/create-multiple-db-with-users.sh:ro
+    healthcheck:
+      test: "pg_isready -U postgres"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      
+  pgadmin:
+    container_name: "fintech-pgadmin"
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    entrypoint: >
+      /bin/sh -c "
+      cp -f /pgadmin4/pgpass /var/lib/pgadmin/;
+      chmod 600 /var/lib/pgadmin/pgpass;
+      /entrypoint.sh
+      "
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    ports:
+      - "8080:80"
+    networks:
+      - fintech-network
+    volumes:
+      - ./tools/database-dev/configs/servers.json:/pgadmin4/servers.json:ro
+      - ./tools/database-dev/configs/pgpass:/pgadmin4/pgpass:ro
+
+
+  # Migrations:
+
+  liquibase-pe:
+    image: liquibase/liquibase:4.19.0
+    container_name: liquibase-pe
+    networks:
+      - fintech-network
+    volumes:
+      - ./product_engine/migrations:/app
+    command: --log-level ERROR  --defaultsFile=/app/dev.properties update
+    depends_on:
+      - pgadmin
+      - postgresql
+  
+  liquibase-origination:
+    image: liquibase/liquibase:4.19.0
+    container_name: liquibase-origination
+    networks:
+      - fintech-network
+    volumes:
+      - ./origination/migrations:/app
+    command: --log-level ERROR  --defaultsFile=/app/dev.properties update
+    depends_on:
+      - pgadmin
+      - postgresql
+
+  # Services
+  product_engine:
+    build:
+      context: ./product_engine/src
+    container_name: product_engine
+    networks:
+      - fintech-network
+    ports:
+      - "80:80"
+    depends_on:
+      - liquibase-pe
+
+  origination:
+    build:
+      context: ./origination/src
+    container_name: origination
+    networks:
+      - fintech-network
+    ports:
+      - "90:90"
+    depends_on:
+      - liquibase-origination
+
+  gateway:
+    build:
+      context: ./gateway/src
+    container_name: gateway
+    networks:
+      - fintech-network
+    ports:
+      - "7022:7022"
+    depends_on:
+      - product_engine
+      - origination
+
+
+networks:
+  fintech-network:
+    name: "fintech-network"

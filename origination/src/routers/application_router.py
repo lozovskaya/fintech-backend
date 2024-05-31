@@ -2,11 +2,11 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 import requests
 
 from dependencies import PRODUCT_ENGINE_URL, get_db
-from src.models.models import Application
-from src.models import enums
-from src.models.schemas import ApplicationRequest, ApplicationResponse
+from models.models import Application
+from models import enums
+from models.schemas import ApplicationRequest, ApplicationResponse
 from sqlalchemy.orm import Session
-from src.cruds import crud_applications
+from cruds import crud_applications
 
 import logging
 
@@ -27,7 +27,7 @@ def send_application_to_scoring(db: Session, application_id: int) -> None:
     return 
 
 # Create a new application
-@router.post("/", response_model=ApplicationResponse)
+@router.post("/", response_model=ApplicationResponse, summary="Create an application", description="Validates product data, sends an application to Scoring service.")
 async def create_application(application: ApplicationRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)) -> ApplicationResponse:
     # Validate product data
     response = requests.get(url = PRODUCT_ENGINE_URL + f"/product/id/{application.product_id}")
@@ -54,7 +54,7 @@ async def create_application(application: ApplicationRequest, background_tasks: 
     return ApplicationResponse(application_id=application_id)
 
 # Cancel an application by id
-@router.post("/{application_id}/close", response_model=None)
+@router.post("/{application_id}/close", response_model=None, summary="Cancel the application", description="Cancels the existing application, send the cancellation request to Scoring and Product Engine services.")
 async def cancel_application(application_id : int, db: Session = Depends(get_db)) -> None:
     application = crud_applications.get_application_by_id(db, application_id)
     
@@ -71,7 +71,7 @@ async def cancel_application(application_id : int, db: Session = Depends(get_db)
     crud_applications.update_status_of_application(db, application_id, enums.ApplicationStatus.CANCELLED)
     return
 
-@router.get("/{application_id}/get")
+@router.get("/{application_id}/get", summary="Get the application", description="Fetches the application by its id from the database.")
 async def get_application(application_id : int, db: Session = Depends(get_db)) -> None:
     application = crud_applications.get_application_by_id(db, application_id)
     if not application:

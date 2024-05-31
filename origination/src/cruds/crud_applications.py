@@ -1,9 +1,8 @@
 from typing import List
-from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from src.models.enums import ApplicationStatus
-from src.models.models import Application
+from models.enums import ApplicationStatus
+from models.models import Application
 
 
 def get_application_by_id(db: Session, application_id: int) -> Application:

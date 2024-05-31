@@ -3,8 +3,8 @@ from typing import List
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from src.models.schemas import ClientModel
-from src.models.models import Client
+from models.schemas import ClientModel
+from models.models import Client
 
 
 def get_client_by_client_id(db: Session, client_id: int) -> Client:

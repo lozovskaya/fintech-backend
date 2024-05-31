@@ -2,9 +2,9 @@ import random
 from fastapi import APIRouter, Depends, HTTPException
 
 from dependencies import get_db
-from src.models.schemas import AgreementModel, AgreementRequest, AgreementResponse
+from models.schemas import AgreementModel, AgreementRequest, AgreementResponse
 from sqlalchemy.orm import Session
-from src.cruds import crud_agreements, crud_products, crud_clients
+from cruds import crud_agreements, crud_products, crud_clients
 from datetime import datetime
 
 
@@ -14,7 +14,7 @@ router = APIRouter(
 )
 
 # Creates a new agreement
-@router.post("/", response_model=AgreementResponse)
+@router.post("/", response_model=AgreementResponse, summary="Create a new agreement", description="Validate credit terms, creates a new client if non-existent before, creates a new agreement.")
 def create_agreement(agreement: AgreementRequest, db: Session = Depends(get_db)) -> AgreementResponse:
     # Check if the product with the given code already exists
     product = crud_products.get_product_by_internal_code(db, agreement.product_code)
