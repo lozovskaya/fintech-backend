@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Float, Integer, String
+from sqlalchemy import Column, DateTime, Float, Integer, String
 
 
 from .database import Base
@@ -14,3 +14,4 @@ class Application(Base):
     term = Column(Integer)
     interest = Column(Float)
     status = Column(String)
+    timestamp = Column(DateTime)

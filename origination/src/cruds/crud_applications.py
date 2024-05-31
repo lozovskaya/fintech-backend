@@ -1,8 +1,10 @@
 from typing import List
 from sqlalchemy.orm import Session
+from sqlalchemy import desc 
 
 from models.enums import ApplicationStatus
 from models.models import Application
+from models.schemas import ApplicationRequest
 
 
 def get_application_by_id(db: Session, application_id: int) -> Application:
@@ -14,11 +16,19 @@ def get_all_applications(db: Session) -> List[Application]:
 
 
 def get_all_applications_by_client(db: Session, client_id: int) -> List[Application]:
-    return db.query(Application).filter(Application.client_id == client_id).all()
+    return db.query(Application).filter(Application.client_id == client_id).order_by(desc(Application.timestamp)).all()
 
 
 def get_status_of_application_by_id(db: Session, application_id: int) -> ApplicationStatus:
     return ApplicationStatus[db.query(Application).filter(Application.application_id == application_id).first().status]
+
+
+def get_same_applications(db: Session, application: ApplicationRequest) -> List[Application]:
+    return db.query(Application).filter(Application.client_id == application.client_id, 
+                                        Application.product_id == application.product_id,
+                                        Application.disbursement_amount == application.disbursment_amount,
+                                        Application.term == application.term,
+                                        Application.interest == application.interest).all()
 
 
 def create_application(db: Session, db_application: Application) -> int:

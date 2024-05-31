@@ -9,5 +9,6 @@ def get_db():
         db.close()
 
 
-PRODUCT_ENGINE_URL = "http://product-engine:80"
+PRODUCT_ENGINE_URL = "http://host.docker.internal:80"
 SCORING_SERVICE_URL = "unknown" # todo: replace
+MIN_TIME_BETWEEN_APPLICATIONS_IN_SEC = 5 * 50 # 5 minutes

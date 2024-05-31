@@ -1,30 +1,37 @@
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 import requests
 
-from dependencies import PRODUCT_ENGINE_URL, get_db
+from dependencies import PRODUCT_ENGINE_URL, get_db, MIN_TIME_BETWEEN_APPLICATIONS_IN_SEC
 from models.models import Application
 from models import enums
 from models.schemas import ApplicationRequest, ApplicationResponse
 from sqlalchemy.orm import Session
 from cruds import crud_applications
 
-import logging
+import datetime
 
 
 router = APIRouter(
     prefix="/application",
     tags=["application"],
 )
-logging.basicConfig(
-    level=logging.INFO,  # Set the logging level
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+
 
 def send_application_to_scoring(db: Session, application_id: int) -> None:
     scoring_response = enums.ApplicationStatus.CONFIRMED # todo: replace with a request to Scoring
     crud_applications.update_status_of_application(db, application_id, scoring_response)
     return 
+
+
+def is_same_application_in_db(db: Session, application: ApplicationRequest) -> bool:
+    if crud_applications.get_same_applications(db, application):
+        return True
+    recent_timestamp = crud_applications.get_all_applications_by_client(db, application.client_id)
+    if not recent_timestamp:
+        return False
+    recent_timestamp = recent_timestamp[0].timestamp
+    return (datetime.datetime.now() - recent_timestamp).total_seconds() < MIN_TIME_BETWEEN_APPLICATIONS_IN_SEC
+
 
 # Create a new application
 @router.post("/", response_model=ApplicationResponse, summary="Create an application", description="Validates product data, sends an application to Scoring service.")
@@ -39,6 +46,9 @@ async def create_application(application: ApplicationRequest, background_tasks: 
     if not (product["min_interest_rate"] <= application.interest <= product["max_interest_rate"]):
         raise HTTPException(status_code=400, detail=f'Interest should be between {product["min_interest_rate"]} and {product["max_interest_rate"]}')
     
+    # Check if it's the same application that was before
+    if is_same_application_in_db(db, application):
+        raise HTTPException(status_code=409, detail="The same application has already been received before.")
     
     # Create a pending status
     application_id = crud_applications.create_application(db, Application(
@@ -47,7 +57,8 @@ async def create_application(application: ApplicationRequest, background_tasks: 
                                                     disbursement_amount=application.disbursment_amount,
                                                     term=application.term,
                                                     interest=application.interest,
-                                                    status=enums.ApplicationStatus.PENDING.name))
+                                                    status=enums.ApplicationStatus.PENDING.name,
+                                                    timestamp=datetime.datetime.now()))
     
     # Send a request to Scoring service as a background task
     background_tasks.add_task(send_application_to_scoring, db, application_id)
@@ -71,7 +82,7 @@ async def cancel_application(application_id : int, db: Session = Depends(get_db)
     crud_applications.update_status_of_application(db, application_id, enums.ApplicationStatus.CANCELLED)
     return
 
-@router.get("/{application_id}/get", summary="Get the application", description="Fetches the application by its id from the database.")
+@router.get("/{application_id}/get", summary="Get the application status", description="Fetches the application status by its id from the database.")
 async def get_application(application_id : int, db: Session = Depends(get_db)) -> None:
     application = crud_applications.get_application_by_id(db, application_id)
     if not application:

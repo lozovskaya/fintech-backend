@@ -1,2 +1,2 @@
-PRODUCT_ENGINE_URL = "http://product-engine:80"
-ORIGINATION_URL = "http://origination:90"
+PRODUCT_ENGINE_URL = "http://host.docker.internal:80"
+ORIGINATION_URL = "http://host.docker.internal:90"
