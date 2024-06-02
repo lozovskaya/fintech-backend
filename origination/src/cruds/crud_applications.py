@@ -15,6 +15,10 @@ def get_all_applications(db: Session) -> List[Application]:
     return db.query(Application).all()
 
 
+def get_all_applications_by_status(db: Session, status: ApplicationStatus) -> List[Application]:
+    return db.query(Application).filter(Application.status == status.name).all()
+
+
 def get_all_applications_by_client(db: Session, client_id: int) -> List[Application]:
     return db.query(Application).filter(Application.client_id == client_id).order_by(desc(Application.timestamp)).all()
 
