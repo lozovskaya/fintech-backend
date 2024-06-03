@@ -7,6 +7,7 @@ class ApplicationRequest(BaseModel):
     term: int
     interest: float
 
+
 class ApplicationResponse(BaseModel):
     application_id: int
     
