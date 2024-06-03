@@ -56,7 +56,12 @@ async def create_application(application: ApplicationRequest, background_tasks: 
     
     # Check if it's the same application that was before
     if is_same_application_in_db(db, application):
-        raise HTTPException(status_code=409, detail="The same application has already been received before.")
+        application_id = crud_applications.get_same_applications(db, application)[0].application_id
+        details = {
+            "message": "The same application has already been received before.",
+            "application_id": application_id,
+        }
+        raise HTTPException(status_code=409, detail=details)
     
     # Create a pending status
     application_id = crud_applications.create_application(db, Application(
@@ -98,3 +103,12 @@ async def get_application(application_id : int, db: Session = Depends(get_db)) -
         raise HTTPException(status_code=404, detail="Application with the given ID does not exist.")
 
     return crud_applications.get_status_of_application_by_id(db, application_id).name
+
+
+@router.get("/get", summary="Get the application status", description="Fetches the application status by its full info from the database.")
+async def get_application_status_by_full_data(application_data : ApplicationRequest, db: Session = Depends(get_db)) -> None:
+    application = crud_applications.get_same_applications(db, application_data)
+    if not application:
+        raise HTTPException(status_code=404, detail="Application with the given data does not exist.")
+    application = application[0]
+    return crud_applications.get_status_of_application_by_id(db, application.application_id).name

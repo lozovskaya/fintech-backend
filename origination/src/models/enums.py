@@ -6,4 +6,3 @@ class ApplicationStatus(Enum):
     REJECTED = 3
     CANCELLED = 4
     CREATED = 5
-    DECLINED = 6

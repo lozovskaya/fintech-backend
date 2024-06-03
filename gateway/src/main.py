@@ -31,17 +31,17 @@ async def get_product_by_code(product_code: str):
 @app.post("/agreement", summary="Create agreement", description="Creates a new agreement in the Product Engine service.")
 async def create_agreement(agreement: AgreementRequest):
     response = requests.post(f"{PRODUCT_ENGINE_URL}/agreement", json=agreement.model_dump())
-    if response.status_code != 200:
+    if response.status_code != 201:
         raise HTTPException(status_code=response.status_code, detail=response.text)
     return response.json()
 
 
-@app.post("/application", summary="Create application", description="Creates a new application in the Origination service.")
-async def create_application(application: ApplicationRequest):
-    response = requests.post(f"{ORIGINATION_URL}/application", json=application.model_dump())
-    if response.status_code != 200:
-        raise HTTPException(status_code=response.status_code, detail=response.text)
-    return response.json()
+# @app.post("/application", summary="Create application", description="Creates a new application in the Origination service.")
+# async def create_application(application: ApplicationRequest):
+#     response = requests.post(f"{ORIGINATION_URL}/application", json=application.model_dump())
+#     if response.status_code != 200:
+#         raise HTTPException(status_code=response.status_code, detail=response.text)
+#     return response.json()
 
 
 @app.post("/application/{application_id}/close", summary="Close application", description="Closes an application in the Origination service.")
