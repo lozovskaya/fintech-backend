@@ -45,6 +45,6 @@ class TasksScheduler(metaclass=SingletonMeta):
                                                            disbursment_amount=agreement.disbursment_amount,
                                                            term=agreement.term,
                                                            interest=agreement.interest_rate))
-            if response.status_code != status.HTTP_409_CONFLICT:
+            if response and response.status_code != status.HTTP_409_CONFLICT:
                 # origination service doens't have this application / agreement
                 logger.info(f"Created a new application in Origination: {response['application_id']}.")

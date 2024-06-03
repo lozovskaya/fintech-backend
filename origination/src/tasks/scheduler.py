@@ -6,7 +6,7 @@ from models.enums import ApplicationStatus
 from cruds import crud_applications
 from clients.scoring_client import ScoringClient
 
-from libs.metaclasses import SingletonMeta
+from common.libs.metaclasses import SingletonMeta
 from models import enums
 from models.database import SessionLocal
 from models.schemas import ApplicationRequestToScoring

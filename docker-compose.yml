@@ -86,7 +86,8 @@ services:
   # Services
   product_engine:
     build:
-      context: ./product_engine/src
+      dockerfile: ./product_engine/src/Dockerfile
+      context: ./
     container_name: product_engine
     networks:
       - fintech-network
@@ -97,7 +98,8 @@ services:
 
   origination:
     build:
-      context: ./origination/src
+      dockerfile: ./origination/src/Dockerfile
+      context: ./
     container_name: origination
     networks:
       - fintech-network
@@ -108,7 +110,8 @@ services:
 
   gateway:
     build:
-      context: ./gateway/src
+      dockerfile: ./gateway/src/Dockerfile
+      context: ./
     container_name: gateway
     networks:
       - fintech-network
@@ -120,7 +123,8 @@ services:
   
   scoring:
     build:
-      context: ./scoring/src
+      dockerfile: ./scoring/src/Dockerfile
+      context: ./
     container_name: scoring
     networks:
       - fintech-network

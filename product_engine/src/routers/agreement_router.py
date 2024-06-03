@@ -2,7 +2,7 @@ import random
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from dependencies import get_db, get_origination_client
-from models.schemas import AgreementModel, AgreementRequest, AgreementResponse
+from models.schemas import AgreementModel, AgreementRequest
 from sqlalchemy.orm import Session
 from cruds import crud_agreements, crud_products, crud_clients
 from datetime import datetime
