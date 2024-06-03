@@ -19,7 +19,7 @@ def get_product_by_id(db: Session, product_id: int) -> Product:
 
 def create_product(db: Session, product: ProductModel) -> Product:
     try:
-        product_data = product.dict()
+        product_data = product.model_dump()
         db_product = Product(**product_data)
     except ValidationError as e:
         return None
