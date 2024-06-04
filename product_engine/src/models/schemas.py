@@ -11,7 +11,7 @@ class AgreementModel(BaseModel):
     origination_amount : float
     activation_date : datetime.datetime
     status : str
-    disbursment_amount : float
+    disbursement_amount : float
     
     
 class ProductModel(BaseModel):
@@ -43,7 +43,7 @@ class AgreementRequest(BaseModel):
     client : ClientModel
     term: int
     interest: float
-    disbursment_amount: float
+    disbursement_amount: float
 
 class AgreementResponse(BaseModel):
     agreement_id: int
@@ -52,6 +52,6 @@ class AgreementResponse(BaseModel):
 class ApplicationRequest(BaseModel):
     client_id : int
     product_id : int
-    disbursment_amount: float
+    disbursement_amount: float
     term: int
     interest: float

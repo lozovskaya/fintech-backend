@@ -42,7 +42,7 @@ class AgreementCBV:
 
         # Calculate origination amount
         origination_amount = random.uniform(product.min_origination_amount, product.max_origination_amount)
-        principal_amount = agreement.disbursment_amount + origination_amount
+        principal_amount = agreement.disbursement_amount + origination_amount
 
         # Validate credit terms
         if not (product.min_loan_term <= agreement.term <= product.max_loan_term):
@@ -60,12 +60,12 @@ class AgreementCBV:
                                                                 origination_amount=origination_amount,
                                                                 activation_date=datetime.now(),
                                                                 status=AgreementStatus.NEW.name,
-                                                                disbursment_amount=agreement.disbursment_amount))
+                                                                disbursement_amount=agreement.disbursement_amount))
         
         # Send it to Origination
         response = self.origination_client.post_application(ApplicationRequest(client_id=client_id,
                                                             product_id=product.product_id,
-                                                            disbursment_amount=agreement.disbursment_amount,
+                                                            disbursement_amount=agreement.disbursement_amount,
                                                             term=agreement.term,
                                                             interest=agreement.interest))
         if not response:

@@ -42,7 +42,7 @@ class TasksScheduler(metaclass=SingletonMeta):
         for agreement in agreements_new:
             response = self.origination_client.post_application(ApplicationRequest(client_id=agreement.client_id,
                                                            product_id=agreement.product_id,
-                                                           disbursment_amount=agreement.disbursment_amount,
+                                                           disbursement_amount=agreement.disbursement_amount,
                                                            term=agreement.term,
                                                            interest=agreement.interest_rate))
             if response and response.status_code != status.HTTP_409_CONFLICT:

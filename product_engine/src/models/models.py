@@ -47,7 +47,7 @@ class Agreement(Base):
     origination_amount = Column(Float)
     activation_date = Column(DateTime, index=True)
     status = Column(String)
-    disbursment_amount = Column(Float)
+    disbursement_amount = Column(Float)
 
     product = relationship("Product", back_populates="agreement")
     client = relationship("Client", back_populates="agreement")
