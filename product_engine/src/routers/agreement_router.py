@@ -1,16 +1,17 @@
 import random
+from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi_utils.cbv import cbv
 
-from dependencies import get_db, get_origination_client
-from models.schemas import AgreementModel, AgreementRequest
-from sqlalchemy.orm import Session
+from dependencies import get_origination_client, get_repo_dep
+from models.schemas import AgreementModel, AgreementRequest, ApplicationRequest
 from cruds import crud_agreements, crud_products, crud_clients
 from datetime import datetime
 
 from models.enums import AgreementStatus
 from clients.origination_client import OriginationClient
-from models.schemas import ApplicationRequest
+from models.models import Agreement
+from common.repo.repository import DatabaseRepository
 
 
 router = APIRouter(
@@ -18,23 +19,28 @@ router = APIRouter(
     tags=["agreement"],
 )
 
+AgreementRepository = Annotated[
+    DatabaseRepository[Agreement],
+    Depends(get_repo_dep(Agreement)),
+]
+
 @cbv(router)
 class AgreementCBV:
-    db: Session = Depends(get_db)
+    repo: AgreementRepository = Depends(get_repo_dep(Agreement))
     origination_client : OriginationClient = Depends(get_origination_client)
 
     # Creates a new agreement
     @router.post("/", response_model=int, summary="Create a new agreement", description="Validate credit terms, creates a new client if non-existent before, creates a new agreement.", status_code=status.HTTP_201_CREATED)
-    def create_agreement(self, agreement: AgreementRequest) -> int:
+    async def create_agreement(self, agreement: AgreementRequest) -> int:
         # Check if the product with the given code already exists
-        product = crud_products.get_product_by_internal_code(self.db, agreement.product_code)
+        product = await crud_products.get_product_by_internal_code(self.repo, agreement.product_code)
         if not product:
             raise HTTPException(status_code=400, detail="Product with the specified internal code code does not exist")
 
         # Check if the client with the given data already exists or create the new one
-        client = crud_clients.get_client_by_all_data(self.db, agreement.client)
+        client = await crud_clients.get_client_by_all_data(self.repo, agreement.client)
         if client is None:
-            client_id = crud_clients.create_client(self.db, agreement.client)
+            client_id = await crud_clients.create_client(self.repo, agreement.client)
             if not client_id:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Client info is not valid")
         else:
@@ -51,7 +57,7 @@ class AgreementCBV:
             raise HTTPException(status_code=400, detail=f"Interest should be between {product.min_interest_rate} and {product.max_interest_rate}")
 
         # Create agreement
-        new_agreement = crud_agreements.create_agreement(self.db, AgreementModel(
+        new_agreement = await crud_agreements.create_agreement(self.repo, AgreementModel(
                                                                 product_id=product.product_id,
                                                                 client_id=client_id,
                                                                 term=agreement.term,
