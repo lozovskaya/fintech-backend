@@ -12,8 +12,6 @@ from models.models import Application
 from common.libs.metaclasses import SingletonMeta
 from models import enums
 from models.schemas import ApplicationRequestToScoring
-from common.repo.repository import DatabaseRepository
-from sqlalchemy.ext.asyncio import AsyncSession
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -58,7 +56,7 @@ class TasksScheduler(metaclass=SingletonMeta):
                     response = self.scoring_client.get_scoring_id_of_application(application.application_id)
                     if response:
                         scoring_id = response["scoring_id"]
-                        await self.schedule_scoring_status_check(application.application_id, scoring_id)
+                        self.schedule_scoring_status_check(application.application_id, scoring_id)
                     
             for application in applications_created:
                 response = self.scoring_client.send_application_for_scoring(application=ApplicationRequestToScoring(application_id=application.application_id,
@@ -70,10 +68,11 @@ class TasksScheduler(metaclass=SingletonMeta):
                 if response:
                     scoring_id = response["scoring_id"]
                     await repository.update(Application.application_id == application.application_id, data={"status": enums.ApplicationStatus.PENDING.name})
-                    await self.schedule_scoring_status_check(application.application_id, scoring_id)
+                    self.schedule_scoring_status_check(application.application_id, scoring_id)
 
 
     async def check_scoring_status(self, application_id: int, scoring_id: int) -> bool:
+        logger.info(f"Starting check_scoring_status job {application_id}.")
         response = self.scoring_client.get_scoring_status_of_application(scoring_id)
         if not response:
             return False

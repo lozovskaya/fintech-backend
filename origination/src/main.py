@@ -1,4 +1,3 @@
-import asyncio
 from fastapi import FastAPI
 from dependencies import get_task_scheduler
 from routers import application_router

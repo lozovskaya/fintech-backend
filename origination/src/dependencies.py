@@ -3,7 +3,7 @@ from typing import Any
 from models import database
 from clients.scoring_client import ScoringClient
 
-from common.repo.session import get_repository, get_repository_callable, get_db_session_callable
+from common.repo.session import get_repository, get_repository_callable
 from models.models import Application
 from common.repo.repository import DatabaseRepository
 from tasks.scheduler import TasksScheduler

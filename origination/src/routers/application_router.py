@@ -31,16 +31,16 @@ class ApplicationCBV:
     scheduler: TasksScheduler = Depends(get_task_scheduler)
     scoring_client: ScoringClient = Depends(get_scoring_client)
 
-    def send_application_to_scoring(self, application: Application) -> None:
+    async def send_application_to_scoring(self, application: Application) -> None:
         response = self.scoring_client.send_application_for_scoring(application=ApplicationRequestToScoring(application_id=application.application_id,
-                                                                                                    client_id=application.client_id,
-                                                                                                        product_id=application.product_id,
-                                                                                                        disbursement_amount=application.disbursement_amount,
-                                                                                                        term=application.term,
-                                                                                                        interest=application.interest))
+                                                                                                            client_id=application.client_id,
+                                                                                                            product_id=application.product_id,
+                                                                                                            disbursement_amount=application.disbursement_amount,
+                                                                                                            term=application.term,
+                                                                                                            interest=application.interest))
         if response:
             scoring_id = response["scoring_id"]
-            crud_applications.update_status_of_application(self.repo, application.application_id, enums.ApplicationStatus.PENDING)
+            await crud_applications.update_status_of_application(self.repo, application.application_id, enums.ApplicationStatus.PENDING)
             self.scheduler.schedule_scoring_status_check(application.application_id, scoring_id)
 
 

@@ -1,6 +1,6 @@
 from typing import Any, Generic, TypeVar
 
-from sqlalchemy import BinaryExpression, ColumnExpressionArgument, select, delete, update
+from sqlalchemy import BinaryExpression, select, delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from sqlalchemy.orm import DeclarativeBase
