@@ -1,8 +1,8 @@
 from fastapi import FastAPI, HTTPException
 import requests
 
-from dependencies import PRODUCT_ENGINE_URL, ORIGINATION_URL
-from models.schemas import AgreementRequest, ApplicationRequest
+from common.settings.urls import PRODUCT_ENGINE_URL, ORIGINATION_URL
+from models.schemas import AgreementRequest
 
 
 app = FastAPI()

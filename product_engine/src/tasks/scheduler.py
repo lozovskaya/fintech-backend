@@ -39,13 +39,13 @@ class TasksScheduler(metaclass=SingletonMeta):
         logger.info("Starting scan and resend applications job.")
         async for repository in self.get_repo(Agreement):
             agreements_new = await crud_agreements.get_all_agreements_by_status(repository, AgreementStatus.NEW)
-            
-            for agreement in agreements_new:
-                response = self.origination_client.post_application(ApplicationRequest(client_id=agreement.client_id,
-                                                            product_id=agreement.product_id,
-                                                            disbursement_amount=agreement.disbursement_amount,
-                                                            term=agreement.term,
-                                                            interest=agreement.interest_rate))
-                if response and response.status_code != status.HTTP_409_CONFLICT:
-                    # origination service doens't have this application / agreement
-                    logger.info(f"Created a new application in Origination: {response['application_id']}.")
+            if agreements_new:
+                for agreement in agreements_new:
+                    response = self.origination_client.post_application(ApplicationRequest(client_id=agreement.client_id,
+                                                                product_id=agreement.product_id,
+                                                                disbursement_amount=agreement.disbursement_amount,
+                                                                term=agreement.term,
+                                                                interest=agreement.interest_rate))
+                    if response and response.status_code != status.HTTP_409_CONFLICT:
+                        # origination service doens't have this application / agreement
+                        logger.info(f"Created a new application in Origination: {response['application_id']}.")

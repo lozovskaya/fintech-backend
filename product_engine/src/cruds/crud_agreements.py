@@ -34,7 +34,7 @@ async def create_agreement(repo: DatabaseRepository, agreement: AgreementModel) 
     except ValidationError:
         return None
     created_agreement = await repo.create(agreement_data)
-    return created_agreement.agreement_id
+    return created_agreement
 
 async def delete_agreement(repo: DatabaseRepository, agreement_id: int) -> Agreement:
     agreement = await get_agreement_by_id(repo, agreement_id)

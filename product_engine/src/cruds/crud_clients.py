@@ -1,7 +1,6 @@
 from datetime import datetime
 from typing import List
 from pydantic import ValidationError
-from sqlalchemy.orm import Session
 
 from models.schemas import ClientModel
 from models.models import Client

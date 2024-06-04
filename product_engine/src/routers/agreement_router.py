@@ -10,7 +10,7 @@ from datetime import datetime
 
 from models.enums import AgreementStatus
 from clients.origination_client import OriginationClient
-from models.models import Agreement
+from models.models import Agreement, Client, Product
 from common.repo.repository import DatabaseRepository
 
 
@@ -23,9 +23,20 @@ AgreementRepository = Annotated[
     DatabaseRepository[Agreement],
     Depends(get_repo_dep(Agreement)),
 ]
+ClientRepository = Annotated[
+    DatabaseRepository[Client],
+    Depends(get_repo_dep(Client)),
+]
+ProductRepository = Annotated[
+    DatabaseRepository[Product],
+    Depends(get_repo_dep(Product)),
+]
+
 
 @cbv(router)
 class AgreementCBV:
+    repo_product: ProductRepository = Depends(get_repo_dep(Product))
+    repo_client: ClientRepository = Depends(get_repo_dep(Client))
     repo: AgreementRepository = Depends(get_repo_dep(Agreement))
     origination_client : OriginationClient = Depends(get_origination_client)
 
@@ -33,14 +44,14 @@ class AgreementCBV:
     @router.post("/", response_model=int, summary="Create a new agreement", description="Validate credit terms, creates a new client if non-existent before, creates a new agreement.", status_code=status.HTTP_201_CREATED)
     async def create_agreement(self, agreement: AgreementRequest) -> int:
         # Check if the product with the given code already exists
-        product = await crud_products.get_product_by_internal_code(self.repo, agreement.product_code)
+        product = await crud_products.get_product_by_internal_code(self.repo_product, agreement.product_code)
         if not product:
             raise HTTPException(status_code=400, detail="Product with the specified internal code code does not exist")
 
         # Check if the client with the given data already exists or create the new one
-        client = await crud_clients.get_client_by_all_data(self.repo, agreement.client)
+        client = await crud_clients.get_client_by_all_data(self.repo_client, agreement.client)
         if client is None:
-            client_id = await crud_clients.create_client(self.repo, agreement.client)
+            client_id = await crud_clients.create_client(self.repo_client, agreement.client)
             if not client_id:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Client info is not valid")
         else:
@@ -52,7 +63,7 @@ class AgreementCBV:
 
         # Validate credit terms
         if not (product.min_loan_term <= agreement.term <= product.max_loan_term):
-            raise HTTPException(status_code=400, detail=f"Agreement term should be between {product.min_loan_term} and {product.max_loan_term} месяцев")
+            raise HTTPException(status_code=400, detail=f"Agreement term should be between {product.min_loan_term} and {product.max_loan_term} months")
         if not (product.min_interest_rate <= agreement.interest <= product.max_interest_rate):
             raise HTTPException(status_code=400, detail=f"Interest should be between {product.min_interest_rate} and {product.max_interest_rate}")
 
@@ -69,11 +80,11 @@ class AgreementCBV:
                                                                 disbursement_amount=agreement.disbursement_amount))
         
         # Send it to Origination
-        response = self.origination_client.post_application(ApplicationRequest(client_id=client_id,
-                                                            product_id=product.product_id,
-                                                            disbursement_amount=agreement.disbursement_amount,
-                                                            term=agreement.term,
-                                                            interest=agreement.interest))
+        response = self.origination_client.post_application(ApplicationRequest( client_id=client_id,
+                                                                                product_id=product.product_id,
+                                                                                disbursement_amount=agreement.disbursement_amount,
+                                                                                term=agreement.term,
+                                                                                interest=agreement.interest))
         if not response:
             details = {
                 "message": "Error: the application in Origination has not been created",

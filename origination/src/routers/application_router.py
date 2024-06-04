@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 import requests
 
-from dependencies import PRODUCT_ENGINE_URL, get_repo_dep, MIN_TIME_BETWEEN_APPLICATIONS_IN_SEC, get_scoring_client, get_task_scheduler
+from dependencies import get_repo_dep, MIN_TIME_BETWEEN_APPLICATIONS_IN_SEC, get_scoring_client, get_task_scheduler
 from models.models import Application
 from models import enums
 from models.schemas import ApplicationRequest, ApplicationResponse, ApplicationRequestToScoring
@@ -13,6 +13,7 @@ import datetime
 
 from clients.scoring_client import ScoringClient
 from common.repo.repository import DatabaseRepository
+from common.settings.urls import PRODUCT_ENGINE_URL
 from tasks.scheduler import TasksScheduler
 
 router = APIRouter(

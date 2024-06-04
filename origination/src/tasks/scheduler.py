@@ -1,4 +1,3 @@
-from collections.abc import Callable
 import logging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger

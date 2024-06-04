@@ -1,7 +1,8 @@
+from sqlalchemy import URL
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import declarative_base
 
-DATABASE_URL = "postgresql+asyncpg://postgres:postgres@host.docker.internal:5432/origination"
-
 Base = declarative_base()
-engine = create_async_engine(DATABASE_URL)
+
+def get_engine(url : URL):
+    return create_async_engine(url)
