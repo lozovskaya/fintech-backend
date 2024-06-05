@@ -62,15 +62,16 @@ class ApplicationCBV:
     # Create a new application
     @router.post("/", response_model=ApplicationResponse, summary="Create an application", description="Validates product data, sends an application to Scoring service.")
     async def create_application(self, application: ApplicationRequest, background_tasks: BackgroundTasks) -> ApplicationResponse:
-        # Validate product data
-        response = requests.get(url = PRODUCT_ENGINE_URL + f"/product/id/{application.product_id}")
-        if response.status_code != status.HTTP_200_OK:
-            raise HTTPException(status_code=400, detail="Product with the given ID does not exist.")
-        product = response.json() 
-        if not (product["min_loan_term"] <= application.term <= product["max_loan_term"]):
-            raise HTTPException(status_code=400, detail=f'Agreement term should be between {product["min_loan_term"]} and {product["max_loan_term"]}')
-        if not (product["min_interest_rate"] <= application.interest <= product["max_interest_rate"]):
-            raise HTTPException(status_code=400, detail=f'Interest should be between {product["min_interest_rate"]} and {product["max_interest_rate"]}')
+        # Validate product data -- commented as the request should be from PR service, we assume all data was checked
+        
+        # response = requests.get(url = PRODUCT_ENGINE_URL + f"/product/id/{application.product_id}")
+        # if response.status_code != status.HTTP_200_OK:
+        #     raise HTTPException(status_code=400, detail="Product with the given ID does not exist.")
+        # product = response.json() 
+        # if not (product["min_loan_term"] <= application.term <= product["max_loan_term"]):
+        #     raise HTTPException(status_code=400, detail=f'Agreement term should be between {product["min_loan_term"]} and {product["max_loan_term"]}')
+        # if not (product["min_interest_rate"] <= application.interest <= product["max_interest_rate"]):
+        #     raise HTTPException(status_code=400, detail=f'Interest should be between {product["min_interest_rate"]} and {product["max_interest_rate"]}')
         
         # Check if it's the same application that was before
         same_application_id = await self.is_same_application_in_db(application)

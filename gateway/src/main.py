@@ -14,7 +14,7 @@ async def root():
 
 @app.get("/product", summary="Get all products", description="Fetches a list of all products from the Product Engine service.")
 async def get_products():
-    response = requests.get(f"{PRODUCT_ENGINE_URL}/product")
+    response = requests.get(f"{PRODUCT_ENGINE_URL}/product", timeout=3.0)
     if response.status_code != 200:
         raise HTTPException(status_code=response.status_code, detail=response.text)
     return response.json()
