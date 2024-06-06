@@ -1,5 +1,10 @@
 version: "3"
 
+  # Kafka
+
+include:
+  - ./tools/kafka-dev/docker-compose.yml
+
 services:
   # Databases:
   postgresql:

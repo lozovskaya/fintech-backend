@@ -1,4 +1,8 @@
+import asyncio
 from functools import lru_cache
+import logging
+from common.kafka.create_config import create_kafka_config_from_settings
+from common.kafka.producer_manager import KafkaProducer
 from models import database
 from clients.origination_client import OriginationClient
 from config.config import ProductEngineSettings
@@ -31,4 +35,15 @@ def get_origination_client():
 def get_task_scheduler():
     return TasksScheduler(origination_client=get_origination_client(), get_repo=get_repo)
 
+@lru_cache
+def get_kafka_config():
+    config = create_kafka_config_from_settings(get_settings())
+    config["loop"] = asyncio.get_event_loop()
+    return config
+
+def get_kafka_producer():
+    return kafka_producer
+    
 engine = database.get_engine(create_db_url_from_settings(get_settings()))
+kafka_producer = KafkaProducer(get_kafka_config())
+logging.basicConfig(level=logging.INFO)
