@@ -13,6 +13,12 @@ async def get_application_by_id(repo: DatabaseRepository, application_id: int) -
         return None
     return application[0]
 
+async def get_application_by_agreement_id(repo: DatabaseRepository, agreement_id: int) -> Application:
+    application = await repo.filter(Application.agreement_id == agreement_id)
+    if not application:
+        return None
+    return application[0]
+
 
 async def get_all_applications(repo: DatabaseRepository) -> List[Application]:
     applications = await repo.filter()
@@ -56,6 +62,14 @@ async def delete_application(repo: DatabaseRepository, application_id: int) -> A
         await repo.delete(Application.application_id == application_id)
         return application
     return None
+
+async def update_status_of_agreement_id(repo: DatabaseRepository, agreement_id: int, new_status: ApplicationStatus):
+    application = await get_application_by_agreement_id(repo, agreement_id)
+    if application:
+        await repo.update(Application.agreement_id == agreement_id, data={"status": new_status.name})
+        return application
+    return None
+
 
 async def update_status_of_application(repo: DatabaseRepository, application_id: int, new_status: ApplicationStatus):
     application = await get_application_by_id(repo, application_id)

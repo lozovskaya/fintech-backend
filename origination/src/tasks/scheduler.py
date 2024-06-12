@@ -9,17 +9,18 @@ from models.models import Application
 
 
 from common.libs.metaclasses import SingletonMeta
-from models import enums
-from models.schemas import ApplicationRequestToScoring
+from models.schemas import ApplicationKafkaRequestToScoring
 
 logger = logging.getLogger(__name__)
 
 class TasksScheduler(metaclass=SingletonMeta):
 
-    def __init__(self, scoring_client : ScoringClient, get_repo):
+    def __init__(self, scoring_client : ScoringClient, get_repo, settings, kafka_producer_scoring_request):
         self.scheduler = AsyncIOScheduler()
         self.scoring_client = scoring_client
         self.get_repo = get_repo
+        self.settings = settings
+        self.kafka_producer_scoring_request = kafka_producer_scoring_request
     
     
     def start_scheduler(self):
@@ -47,26 +48,11 @@ class TasksScheduler(metaclass=SingletonMeta):
         logger.info("Starting scan and update applications job.")
         async for repository in self.get_repo():
             applications_created = await repository.filter(Application.status == ApplicationStatus.CREATED.name)
-            applications_pending = await repository.filter(Application.status == ApplicationStatus.PENDING.name)
             
-            for application in applications_pending:
-                if not self.scheduler.get_job(f"check_scoring_status_{application.application_id}"):
-                    response = self.scoring_client.get_scoring_id_of_application(application.application_id)
-                    if response:
-                        scoring_id = response["scoring_id"]
-                        self.schedule_scoring_status_check(application.application_id, scoring_id)
-                    
             for application in applications_created:
-                response = self.scoring_client.send_application_for_scoring(application=ApplicationRequestToScoring(application_id=application.application_id,
-                                                                                                                client_id=application.client_id,
-                                                                                                                product_id=application.product_id,
-                                                                                                                disbursement_amount=application.disbursement_amount,
-                                                                                                                term=application.term,
-                                                                                                                interest=application.interest))
-                if response:
-                    scoring_id = response["scoring_id"]
-                    await repository.update(Application.application_id == application.application_id, data={"status": enums.ApplicationStatus.PENDING.name})
-                    self.schedule_scoring_status_check(application.application_id, scoring_id)
+                await self.kafka_producer_scoring_request.send_message(self.settings.kafka_topic_scoring_request,
+                                                                ApplicationKafkaRequestToScoring(agreement_id=application.agreement_id, 
+                                                                                                 client_id=application.client_id))
 
 
     async def check_scoring_status(self, application_id: int, scoring_id: int) -> bool:

@@ -1,6 +1,6 @@
 import json
 import random
-from typing import Annotated
+from typing import Annotated, List
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi_utils.cbv import cbv
 
@@ -91,3 +91,14 @@ class AgreementCBV:
                                                                                             term=agreement.term,
                                                                                             interest=agreement.interest))
         return new_agreement.agreement_id
+    
+    @router.get("/{client_id}", response_model=List[int], summary="Get all active (not closed) agreements' ids by client id", description="Fetches all existing active agreements' ids from the database by the given client id.")
+    async def get_all_agreements_by_client_id(self, client_id: int) -> List[int]:
+        agreements = await crud_agreements.get_all_active_agreements_by_client_id(self.repo, client_id)
+        if not agreements:
+            return []
+        
+        for i in range(len(agreements)):
+            agreements[i] = agreements[i].agreement_id
+        
+        return agreements
