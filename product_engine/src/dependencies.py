@@ -3,10 +3,12 @@ from functools import lru_cache
 import logging
 from common.kafka.create_config import create_kafka_config_from_settings
 from common.kafka.producer_manager import KafkaProducer
+from common.kafka.consumer_manager import KafkaConsumer
 from models import database
 from clients.origination_client import OriginationClient
 from config.config import ProductEngineSettings
 from common.settings.urls import ORIGINATION_URL
+from helpers.payment_plan_creator import PaymentPlanHelper
 from tasks.scheduler import TasksScheduler
 from collections.abc import Callable, Coroutine
 from typing import Any
@@ -38,12 +40,23 @@ def get_task_scheduler():
 @lru_cache
 def get_kafka_config():
     config = create_kafka_config_from_settings(get_settings())
-    config["loop"] = asyncio.get_event_loop()
+    config["loop"] = loop
     return config
+
+@lru_cache
+def get_kafka_consumer_config():
+    config = create_kafka_config_from_settings(get_settings())
+    config["loop"] = loop
+    config["group_id"] = get_settings().group_id
+    return config
+
 
 def get_kafka_producer():
     return kafka_producer
     
+loop = asyncio.get_event_loop()
 engine = database.get_engine(create_db_url_from_settings(get_settings()))
 kafka_producer = KafkaProducer(get_kafka_config())
+kafka_consumer = KafkaConsumer(get_kafka_consumer_config())
+payment_plan_helper = PaymentPlanHelper()
 logging.basicConfig(level=logging.INFO)

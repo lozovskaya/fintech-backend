@@ -66,3 +66,13 @@ class KafkaProducerNewAgreementMessage(BaseModel):
     disbursement_amount: float
     term: int
     interest: float
+
+class SchedulePaymentModel(BaseModel):
+    agreement_id : int
+    status : str
+    payment_order : int
+    planned_payment_date : datetime.date
+    period_start_date : datetime.date
+    period_end_date : datetime.date
+    principal_payment : float
+    interest_payment : float

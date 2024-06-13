@@ -11,7 +11,9 @@ class ProductEngineSettings(BaseSettings):
     
     # Kafka config:
     kafka_topic_agreement : str
+    kafka_topic_scoring_response : str
     kafka_host : str
     kafka_port : str
+    group_id : str
 
     model_config = SettingsConfigDict(env_file=".env")
