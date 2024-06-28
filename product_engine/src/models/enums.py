@@ -11,3 +11,5 @@ class ScoringStatus(Enum):
 
 class SchedulePaymentStatus(Enum):
     FUTURE = 1
+    PAID = 2
+    OVERDUE = 3

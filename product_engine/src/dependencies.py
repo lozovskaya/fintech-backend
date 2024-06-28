@@ -35,7 +35,8 @@ def get_origination_client():
 
 
 def get_task_scheduler():
-    return TasksScheduler(origination_client=get_origination_client(), get_repo=get_repo)
+    return TasksScheduler(origination_client=get_origination_client(), get_repo=get_repo, kafka_producer=kafka_producer, 
+                          kafka_topic_overdue_payment=get_settings().kafka_topic_overdue_payment)
 
 @lru_cache
 def get_kafka_config():
@@ -58,5 +59,6 @@ loop = asyncio.get_event_loop()
 engine = database.get_engine(create_db_url_from_settings(get_settings()))
 kafka_producer = KafkaProducer(get_kafka_config())
 kafka_consumer = KafkaConsumer(get_kafka_consumer_config())
+kafka_consumer_payment_received = KafkaConsumer(get_kafka_consumer_config())
 payment_plan_helper = PaymentPlanHelper()
 logging.basicConfig(level=logging.INFO)

@@ -12,6 +12,8 @@ class ProductEngineSettings(BaseSettings):
     # Kafka config:
     kafka_topic_agreement : str
     kafka_topic_scoring_response : str
+    kafka_topic_payment_received : str
+    kafka_topic_overdue_payment : str
     kafka_host : str
     kafka_port : str
     group_id : str
