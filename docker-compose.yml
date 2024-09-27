@@ -8,7 +8,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: postgres
-      POSTGRES_MULTIPLE_DATABASES: product_engine, origination
+      POSTGRES_MULTIPLE_DATABASES: product_engine, origination, scoring
     ports:
       - "5432:5432"
     networks:
@@ -71,6 +71,18 @@ services:
       - pgadmin
       - postgresql
 
+  liquibase-scoring:
+    image: liquibase/liquibase:4.19.0
+    container_name: liquibase-scoring
+    networks:
+      - fintech-network
+    volumes:
+      - ./scoring/migrations:/app
+    command: --log-level ERROR  --defaultsFile=/app/dev.properties update
+    depends_on:
+      - pgadmin
+      - postgresql
+
   # Services
   product_engine:
     build:
@@ -105,7 +117,17 @@ services:
     depends_on:
       - product_engine
       - origination
-
+  
+  scoring:
+    build:
+      context: ./scoring/src
+    container_name: scoring
+    networks:
+      - fintech-network
+    ports:
+      - "8008:8008"
+    depends_on:
+      - liquibase-scoring
 
 networks:
   fintech-network:

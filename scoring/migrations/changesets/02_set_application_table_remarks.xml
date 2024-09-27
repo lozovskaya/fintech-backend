@@ -1,0 +1,39 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <changeSet author="alozovskaya" id="setApplicationScoredTableRemarks">  
+        <setTableRemarks catalogName="application_scored"  
+                remarks="Заявки на кредит: оценка"  
+                schemaName="public"  
+                tableName="application_scored"/>
+
+        <setColumnRemarks catalogName="application_scored"   
+                columnDataType="int"  
+                columnName="scoring_id"  
+                remarks="Уникальный ID заявки в процессе оценки"  
+                schemaName="public"  
+                tableName="application_scored"/>
+
+        <setColumnRemarks catalogName="application_scored"   
+                columnDataType="int"  
+                columnName="application_id"  
+                remarks="Уникальный ID заявки"  
+                schemaName="public"  
+                tableName="application_scored"/>
+                
+        <setColumnRemarks catalogName="application_scored"   
+                columnDataType="varchar"  
+                columnName="status"  
+                remarks="Статус заявки"  
+                schemaName="public"  
+                tableName="application_scored"/>
+    </changeSet>
+    
+</databaseChangeLog>

@@ -4,11 +4,16 @@ from sqlalchemy.orm import Session
 
 from models.schemas import AgreementModel
 from models.models import Agreement
+from models.enums import AgreementStatus
 
 
 
 def get_agreement_by_id(db: Session, agreement_id: int) -> Agreement:
     return db.query(Agreement).filter(Agreement.agreement_id == agreement_id).first()
+
+
+def get_all_agreements_by_status(db: Session, status: AgreementStatus) -> List[Agreement]:
+    return db.query(Agreement).filter(Agreement.status == status.name).all()
 
 
 def get_all_agreements(db: Session) -> List[Agreement]:
@@ -17,7 +22,7 @@ def get_all_agreements(db: Session) -> List[Agreement]:
 
 def create_agreement(db: Session, agreement: AgreementModel) -> Agreement:
     try:
-        agreement_data = agreement.dict()
+        agreement_data = agreement.model_dump()
         db_agreement = Agreement(**agreement_data)
     except ValidationError as e:
         return None
