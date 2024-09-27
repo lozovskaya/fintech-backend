@@ -34,6 +34,13 @@ async def get_all_agreements(repo: DatabaseRepository) -> List[Agreement]:
     return agreements
 
 
+async def update_status_of_agreement(repo: DatabaseRepository, agreement_id: int, new_status: AgreementStatus):
+    agreement = await get_agreement_by_id(repo, agreement_id)
+    if agreement:
+        await repo.update(Agreement.agreement_id == agreement_id, data={"status": new_status.name})
+        return agreement
+    return None
+
 async def create_agreement(repo: DatabaseRepository, agreement: AgreementModel) -> Agreement:
     try:
         agreement_data = agreement.model_dump()

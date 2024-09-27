@@ -6,7 +6,7 @@ from fastapi_utils.cbv import cbv
 
 from dependencies import get_kafka_producer, get_origination_client, get_repo_dep, get_settings
 from common.kafka.producer_manager import KafkaProducer
-from models.schemas import AgreementModel, AgreementRequest, ApplicationRequest, KafkaProducerNewAgreementMessage
+from models.schemas import AgreementModel, AgreementRequest, ApplicationRequest, ClientModel, KafkaProducerNewAgreementMessage
 from cruds import crud_agreements, crud_products, crud_clients
 from datetime import datetime
 
@@ -92,13 +92,23 @@ class AgreementCBV:
                                                                                             interest=agreement.interest))
         return new_agreement.agreement_id
     
-    @router.get("/{client_id}", response_model=List[int], summary="Get all active (not closed) agreements' ids by client id", description="Fetches all existing active agreements' ids from the database by the given client id.")
-    async def get_all_agreements_by_client_id(self, client_id: int) -> List[int]:
+    @router.get("/{client_id}", response_model=List[AgreementModel], summary="Get all active (not closed) agreements' ids by client id", description="Fetches all existing active agreements' ids from the database by the given client id.")
+    async def get_all_agreements_by_client_id(self, client_id: int) -> List[AgreementModel]:
         agreements = await crud_agreements.get_all_active_agreements_by_client_id(self.repo, client_id)
         if not agreements:
             return []
         
         for i in range(len(agreements)):
-            agreements[i] = agreements[i].agreement_id
+            agreements[i] =  AgreementModel(
+                                            product_id=agreements[i].product_id,
+                                            client_id=agreements[i].client_id,
+                                            term=agreements[i].term,
+                                            principal=agreements[i].principal,
+                                            interest_rate=agreements[i].interest_rate,
+                                            origination_amount=agreements[i].origination_amount,
+                                            activation_date=agreements[i].activation_date,
+                                            status=agreements[i].status,
+                                            disbursement_amount=agreements[i].disbursement_amount
+                                            )
         
         return agreements

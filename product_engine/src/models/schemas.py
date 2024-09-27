@@ -1,5 +1,6 @@
 import datetime
-from pydantic import BaseModel
+import re
+from pydantic import BaseModel, ValidationInfo, field_validator
 
 
 class AgreementModel(BaseModel):
@@ -26,6 +27,7 @@ class ProductModel(BaseModel):
     min_origination_amount : float
     max_origination_amount : float
 
+MAX_NAME_LEN = 30
 
 class ClientModel(BaseModel):
     first_name: str
@@ -36,6 +38,20 @@ class ClientModel(BaseModel):
     email: str
     phone: str
     salary: float
+    
+    @field_validator('first_name', 'second_name', 'third_name', 'phone', 'email', 'passport_number')
+    @classmethod
+    def validate_names(cls, value: str, info: ValidationInfo):
+        if len(value) > MAX_NAME_LEN:
+            raise ValueError(f'{info.field_name} length must be less than {MAX_NAME_LEN} symbols')
+        return value
+    
+    @field_validator('birthday')
+    @classmethod
+    def validate_birthday(cls, value):
+        if not re.match(r'^\d{2}.\d{2}.\d{4}$', value):
+            raise ValueError('Birthday must be in the format DD.MM.YYYY')
+        return value
 
 
 class AgreementRequest(BaseModel):
@@ -66,3 +82,19 @@ class KafkaProducerNewAgreementMessage(BaseModel):
     disbursement_amount: float
     term: int
     interest: float
+
+class SchedulePaymentModel(BaseModel):
+    agreement_id : int
+    status : str
+    payment_order : int
+    planned_payment_date : datetime.date
+    period_start_date : datetime.date
+    period_end_date : datetime.date
+    principal_payment : float
+    interest_payment : float
+
+class KafkaOverduePayment(BaseModel):
+    client_id : int
+    agreement_id : int
+    overdue_date : datetime.datetime
+    payment : float
