@@ -1,9 +1,13 @@
 FROM python:3.10
 
 WORKDIR /app
-COPY ./requirements.txt ./requirements.txt
+
 RUN pip install --upgrade pip
+ADD ./gateway/src/requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
-COPY . .
+
+ADD ./gateway/src /app
+ADD ./common/ /app/common
+
 EXPOSE 7022
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7022"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7022", "--workers", "5"]

@@ -1,9 +1,6 @@
 from fastapi import FastAPI
 from dependencies import get_task_scheduler
 from routers import application_router
-from models import database
-
-database.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI()
 

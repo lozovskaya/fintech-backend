@@ -1,10 +1,9 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import declarative_base
+from sqlalchemy import URL
 
-DATABASE_URL = "postgresql://postgres:postgres@host.docker.internal:5432/product_engine"
-
-engine = create_engine(DATABASE_URL)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
+
+def get_engine(url : URL):
+    return create_async_engine(url)

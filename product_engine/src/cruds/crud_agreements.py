@@ -1,40 +1,44 @@
 from typing import List
 from pydantic import ValidationError
-from sqlalchemy.orm import Session
 
 from models.schemas import AgreementModel
 from models.models import Agreement
 from models.enums import AgreementStatus
+from common.repo.repository import DatabaseRepository
 
 
-
-def get_agreement_by_id(db: Session, agreement_id: int) -> Agreement:
-    return db.query(Agreement).filter(Agreement.agreement_id == agreement_id).first()
-
-
-def get_all_agreements_by_status(db: Session, status: AgreementStatus) -> List[Agreement]:
-    return db.query(Agreement).filter(Agreement.status == status.name).all()
+async def get_agreement_by_id(repo: DatabaseRepository, agreement_id: int) -> Agreement:
+    agreement = await repo.filter(Agreement.agreement_id == agreement_id)
+    if not agreement:
+        return None
+    return agreement[0]
 
 
-def get_all_agreements(db: Session) -> List[Agreement]:
-    return db.query(Agreement).all()
+async def get_all_agreements_by_status(repo: DatabaseRepository, status: AgreementStatus) -> List[Agreement]:
+    agreements = await repo.filter(Agreement.status == status.name)
+    if not agreements:
+        return None
+    return agreements
 
 
-def create_agreement(db: Session, agreement: AgreementModel) -> Agreement:
+async def get_all_agreements(repo: DatabaseRepository) -> List[Agreement]:
+    agreements = await repo.filter()
+    if not agreements:
+        return None
+    return agreements
+
+
+async def create_agreement(repo: DatabaseRepository, agreement: AgreementModel) -> Agreement:
     try:
         agreement_data = agreement.model_dump()
-        db_agreement = Agreement(**agreement_data)
-    except ValidationError as e:
+    except ValidationError:
         return None
-    db.add(db_agreement)
-    db.commit()
-    db.refresh(db_agreement)
-    return db_agreement
+    created_agreement = await repo.create(agreement_data)
+    return created_agreement
 
-
-def delete_agreement(db: Session, agreement_id: int) -> Agreement:
-    agreement = get_agreement_by_id(agreement_id)
-    db.delete(agreement)
-    db.commit()
-    db.close()
-    return agreement
+async def delete_agreement(repo: DatabaseRepository, agreement_id: int) -> Agreement:
+    agreement = await get_agreement_by_id(repo, agreement_id)
+    if agreement:
+        await repo.delete(Agreement.agreement_id == agreement_id)
+        return agreement
+    return None

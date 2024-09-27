@@ -8,7 +8,7 @@ class OriginationClient:
         self.session = requests.Session()
         
     def post_application(self, application: ApplicationRequest):
-        url = f"{self.base_url}/application/"
+        url = f"{self.base_url}/application"
         try:
             response = self.session.post(url, json=application.model_dump())
             response.raise_for_status()

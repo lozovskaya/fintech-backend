@@ -1,52 +1,60 @@
 from datetime import datetime
 from typing import List
 from pydantic import ValidationError
-from sqlalchemy.orm import Session
 
 from models.schemas import ClientModel
 from models.models import Client
+from common.repo.repository import DatabaseRepository
 
 
-def get_client_by_client_id(db: Session, client_id: int) -> Client:
-    return db.query(Client).filter(Client.client_id == client_id).first()
+
+async def get_client_by_client_id(repo: DatabaseRepository, client_id: int) -> Client:
+    client = await repo.filter(Client.client_id == client_id)
+    if not client:
+        return None
+    return client[0]
 
 
-def get_client_by_all_data(db: Session, client: ClientModel) -> Client:
+async def get_client_by_all_data(repo: DatabaseRepository, client: ClientModel) -> Client:
     try:
-        return db.query(Client).filter(
+        client = await repo.filter(
             Client.full_name == " ".join([client.first_name, client.third_name, client.second_name]),
             Client.birthday == datetime.strptime(client.birthday, "%d.%m.%Y").date(),
             Client.passport == client.passport_number,
-        ).first()
+        )
+        if not client:
+            return None
+        return client[0]
     except ValueError:
         return None
 
 
-def get_all_clients(db: Session) -> List[Client]:
-    return db.query(Client).all()
+async def get_all_clients(repo: DatabaseRepository) -> List[Client]:
+    clients = await repo.filter()
+    if not clients:
+        return None
+    return clients
 
 
-def create_client(db: Session, client: ClientModel) -> int:
+async def create_client(repo: DatabaseRepository, client: ClientModel) -> int:
     try:
-        db_client = Client(full_name=" ".join([client.first_name, client.third_name, client.second_name]),
-                            birthday=datetime.strptime(client.birthday, "%d.%m.%Y").date(),
-                            email=client.email,
-                            phone_number=client.phone,
-                            passport=client.passport_number,
-                            monthly_income=client.salary)
-    except ValidationError as e:
+        client_data = { "full_name" : " ".join([client.first_name, client.third_name, client.second_name]),
+                        "birthday" : datetime.strptime(client.birthday, "%d.%m.%Y").date(),
+                        "email" : client.email,
+                        "phone_number" : client.phone,
+                        "passport" : client.passport_number,
+                        "monthly_income" : client.salary}
+    except ValidationError:
         return None
     except ValueError:
         return None
-    db.add(db_client)
-    db.commit()
-    db.refresh(db_client)
-    return db_client.client_id
+    created_client = await repo.create(client_data)
+    return created_client.client_id
 
 
-def delete_client(db: Session, client_id: int) -> Client:
-    client = get_client_by_client_id(client_id)
-    db.delete(client)
-    db.commit()
-    db.close()
-    return client
+async def delete_client(repo: DatabaseRepository, client_id: int) -> Client:
+    client = get_client_by_client_id(repo, client_id)
+    if client:
+        await repo.delete(Client.client_id == client_id)
+        return client
+    return None

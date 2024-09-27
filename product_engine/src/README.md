@@ -67,7 +67,7 @@ curl -X POST "http://localhost:80/agreement" \
            },
         "term": 6,
         "interest": 10.0,
-        "disbursment_amount": 20000.0
+        "disbursement_amount": 20000.0
         }'
 ```
 

@@ -1,2 +1,7 @@
-PRODUCT_ENGINE_URL = "http://host.docker.internal:80"
-ORIGINATION_URL = "http://host.docker.internal:90"
+from functools import lru_cache
+
+from config.config import GatewaySettings
+
+@lru_cache
+def get_settings():
+    return GatewaySettings()

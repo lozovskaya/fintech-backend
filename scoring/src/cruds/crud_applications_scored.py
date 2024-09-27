@@ -1,45 +1,45 @@
-from sqlalchemy.orm import Session
-
 from models.enums import ScoringStatus
 from models.models import ApplicationScored
+from common.repo.repository import DatabaseRepository
 
 
-def get_scored_application_by_application_id(db: Session, application_id: int) -> ApplicationScored:
-    return db.query(ApplicationScored).filter(ApplicationScored.application_id == application_id).first()
+async def get_scored_application_by_application_id(repo: DatabaseRepository, application_id: int) -> ApplicationScored:
+    scored_applications = await repo.filter(ApplicationScored.application_id == application_id)
+    return scored_applications[0] if scored_applications else None
+
+async def get_scored_application_by_scoring_id(repo: DatabaseRepository, scoring_id: int) -> ApplicationScored:
+    scored_applications = await repo.filter(ApplicationScored.scoring_id == scoring_id)
+    return scored_applications[0] if scored_applications else None
+
+async def get_scored_status_of_application_by_application_id(repo: DatabaseRepository, application_id: int) -> ScoringStatus:
+    scored_application = await get_scored_application_by_application_id(repo, application_id)
+    if scored_application:
+        return ScoringStatus[scored_application.status]
+    return None
+
+async def get_scored_status_of_application_by_scoring_id(repo: DatabaseRepository, scoring_id: int) -> ScoringStatus:
+    scored_application = await get_scored_application_by_scoring_id(repo, scoring_id)
+    if scored_application:
+        return ScoringStatus[scored_application.status]
+    return None
 
 
-def get_scored_application_by_scoring_id(db: Session, scoring_id: int) -> ApplicationScored:
-    return db.query(ApplicationScored).filter(ApplicationScored.scoring_id == scoring_id).first()
+async def create_scored_application(repo: DatabaseRepository, data: dict) -> int:
+    created_scored_application = await repo.create(data)
+    return created_scored_application.scoring_id
 
 
-def get_scored_status_of_application_by_application_id(db: Session, application_id: int) -> ScoringStatus:
-    return ScoringStatus[db.query(ApplicationScored).filter(ApplicationScored.application_id == application_id).first().status]
+async def delete_scored_application(repo: DatabaseRepository, scoring_id: int) -> ApplicationScored:
+    scored_application = await get_scored_application_by_scoring_id(repo, scoring_id)
+    if scored_application:
+        await repo.delete(ApplicationScored.scoring_id == scoring_id)
+        return scored_application
+    return None
 
 
-def get_scored_status_of_application_by_scoring_id(db: Session, scoring_id: int) -> ScoringStatus:
-    return ScoringStatus[db.query(ApplicationScored).filter(ApplicationScored.scoring_id == scoring_id).first().status]
-
-
-def create_scored_application(db: Session, db_scored_application: ApplicationScored) -> int:
-    db.add(db_scored_application)
-    db.commit()
-    db.refresh(db_scored_application)
-    return db_scored_application.scoring_id
-
-
-def delete_scored_application(db: Session, scoring_id: int) -> ApplicationScored:
-    scored_application = get_scored_application_by_scoring_id(db, scoring_id)
-    db.delete(scored_application)
-    db.commit()
-    db.close()
-    return scored_application
-
-
-def update_status_of_scored_application(db: Session, scoring_id: int, new_status: ScoringStatus):
-    scored_application = get_scored_application_by_scoring_id(db, scoring_id)
-    if not scored_application:
-        return
-    scored_application.status = new_status.name
-    db.commit()
-    db.refresh(scored_application)
-    return 
+async def update_status_of_scored_application(repo: DatabaseRepository, scoring_id: int, new_status: ScoringStatus):
+    scored_application = await get_scored_application_by_scoring_id(repo, scoring_id)
+    if scored_application:
+        await repo.update(ApplicationScored.scoring_id == scoring_id, data={"status": new_status.name})
+        return scored_application
+    return None

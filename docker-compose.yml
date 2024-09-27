@@ -56,8 +56,8 @@ services:
       - ./product_engine/migrations:/app
     command: --log-level ERROR  --defaultsFile=/app/dev.properties update
     depends_on:
-      - pgadmin
-      - postgresql
+      postgresql:
+        condition: service_healthy
   
   liquibase-origination:
     image: liquibase/liquibase:4.19.0
@@ -68,8 +68,8 @@ services:
       - ./origination/migrations:/app
     command: --log-level ERROR  --defaultsFile=/app/dev.properties update
     depends_on:
-      - pgadmin
-      - postgresql
+      postgresql:
+        condition: service_healthy
 
   liquibase-scoring:
     image: liquibase/liquibase:4.19.0
@@ -80,54 +80,69 @@ services:
       - ./scoring/migrations:/app
     command: --log-level ERROR  --defaultsFile=/app/dev.properties update
     depends_on:
-      - pgadmin
-      - postgresql
+      postgresql:
+        condition: service_healthy
 
   # Services
   product_engine:
     build:
-      context: ./product_engine/src
+      dockerfile: ./product_engine/src/Dockerfile
+      context: ./
     container_name: product_engine
     networks:
       - fintech-network
     ports:
       - "80:80"
+    env_file:
+      - path: ./product_engine/src/config/.env
     depends_on:
-      - liquibase-pe
+      liquibase-pe:
+        condition: service_completed_successfully
 
   origination:
     build:
-      context: ./origination/src
+      dockerfile: ./origination/src/Dockerfile
+      context: ./
     container_name: origination
     networks:
       - fintech-network
     ports:
       - "90:90"
+    env_file:
+      - path: ./origination/src/config/.env
     depends_on:
-      - liquibase-origination
+      liquibase-origination:
+        condition: service_completed_successfully
 
   gateway:
     build:
-      context: ./gateway/src
+      dockerfile: ./gateway/src/Dockerfile
+      context: ./
     container_name: gateway
     networks:
       - fintech-network
     ports:
       - "7022:7022"
+    env_file:
+      - path: ./gateway/src/config/.env
     depends_on:
       - product_engine
       - origination
   
   scoring:
     build:
-      context: ./scoring/src
+      dockerfile: ./scoring/src/Dockerfile
+      context: ./
     container_name: scoring
     networks:
       - fintech-network
     ports:
       - "8008:8008"
+    env_file:
+      - path: ./scoring/src/config/.env
     depends_on:
-      - liquibase-scoring
+      liquibase-scoring:
+        condition: service_completed_successfully
 
 networks:
   fintech-network:

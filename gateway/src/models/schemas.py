@@ -15,11 +15,11 @@ class AgreementRequest(BaseModel):
     client : ClientModel
     term: int
     interest: float
-    disbursment_amount: float
+    disbursement_amount: float
 
 class ApplicationRequest(BaseModel):
     client_id : int
     product_id : int
-    disbursment_amount: float
+    disbursement_amount: float
     term: int
     interest: float
