@@ -1,0 +1,49 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+    
+     <changeSet author="alozovskaya" id="createProductTable">
+        <createTable tableName="product">
+            <column name="product_id" type="SERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="client_friendly_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="internal_code" type="varchar(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="min_loan_term" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_loan_term" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="min_principal_amount" type="decimal(18, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_principal_amount" type="decimal(18, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="min_interest_rate" type="decimal(5, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_interest_rate" type="decimal(5, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="min_origination_amount" type="decimal(18, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_origination_amount" type="decimal(18, 2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    
+</databaseChangeLog>

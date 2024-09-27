@@ -1,0 +1,88 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <changeSet author="alozovskaya" id="setProductTableRemarks">  
+        <setTableRemarks catalogName="product"  
+                remarks="Характеристики банковских продуктов"  
+                schemaName="public"  
+                tableName="product"/>
+
+        <setColumnRemarks catalogName="product"   
+                columnDataType="varchar"  
+                columnName="client_friendly_name"  
+                remarks="Удобочитаемое название для клиента"  
+                schemaName="public"  
+                tableName="product"/>
+                
+        <setColumnRemarks catalogName="product"   
+                columnDataType="varchar"  
+                columnName="internal_code"  
+                remarks="Внутренний код продукта"  
+                schemaName="public"  
+                tableName="product"/>
+                
+        <setColumnRemarks catalogName="product"   
+                columnDataType="int"  
+                columnName="min_loan_term"  
+                remarks="Минимальный срок кредита"  
+                schemaName="public"  
+                tableName="product"/>
+                
+        <setColumnRemarks catalogName="product"   
+                columnDataType="int"  
+                columnName="max_loan_term"  
+                remarks="Максимальный срок кредита"  
+                schemaName="public"  
+                tableName="product"/>
+                
+        <setColumnRemarks catalogName="product"   
+                columnDataType="decimal"  
+                columnName="min_principal_amount"  
+                remarks="Минимальная сумма кредита"  
+                schemaName="public"  
+                tableName="product"/>
+                
+        <setColumnRemarks catalogName="product"   
+                columnDataType="decimal"  
+                columnName="max_principal_amount"  
+                remarks="Максимальная сумма кредита"  
+                schemaName="public"  
+                tableName="product"/>
+                
+        <setColumnRemarks catalogName="product"   
+                columnDataType="decimal"  
+                columnName="min_interest_rate"  
+                remarks="Минимальная процентная ставка, под которую клиент может получить кредит"  
+                schemaName="public"  
+                tableName="product"/>
+                
+        <setColumnRemarks catalogName="product"   
+                columnDataType="decimal"  
+                columnName="max_interest_rate"  
+                remarks="Максимальная процентная ставка, под которую клиент может получить кредит"  
+                schemaName="public"  
+                tableName="product"/>
+                
+        <setColumnRemarks catalogName="product"   
+                columnDataType="decimal"  
+                columnName="min_origination_amount"  
+                remarks="Минимальная сумма комиссий, которая прибавится к полной стоимости кредита"  
+                schemaName="public"  
+                tableName="product"/>
+                
+        <setColumnRemarks catalogName="product"   
+                columnDataType="decimal"  
+                columnName="max_origination_amount"  
+                remarks="Максимальная сумма комиссий, которая прибавится к полной стоимости кредита"  
+                schemaName="public"  
+                tableName="product"/>
+    </changeSet>
+    
+</databaseChangeLog>

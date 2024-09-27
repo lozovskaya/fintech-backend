@@ -8,6 +8,16 @@
         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
         http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
     
-    
+    <changeSet author="alozovskaya" id="addIndexes">
+        <createIndex indexName="idx_agreement" tableName="agreement" unique="false">
+            <column name="client_id"/>
+            <column name="activation_date"/>
+        </createIndex>
+
+        <createIndex indexName="idx_schedule_payment" tableName="schedule_payment" unique="false">
+            <column name="agreement_id"/>
+            <column name="planned_payment_date"/>
+        </createIndex>
+    </changeSet>
     
 </databaseChangeLog>

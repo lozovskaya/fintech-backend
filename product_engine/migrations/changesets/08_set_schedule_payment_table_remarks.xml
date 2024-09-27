@@ -1,0 +1,75 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+
+    <changeSet author="alozovskaya" id="setSchedulePaymentTableRemarks">  
+        <setTableRemarks catalogName="schedule_payment"  
+                remarks="Характеристики платежей"  
+                schemaName="public"  
+                tableName="schedule_payment"/>
+
+        <setColumnRemarks catalogName="schedule_payment"   
+                columnDataType="int"  
+                columnName="agreement_id"  
+                remarks="По какому договору платеж производится"  
+                schemaName="public"  
+                tableName="schedule_payment"/>
+                
+        <setColumnRemarks catalogName="schedule_payment"   
+                columnDataType="date"  
+                columnName="planned_payment_date"  
+                remarks="Планируемая дата платежа (может быть в будущем)"  
+                schemaName="public"  
+                tableName="schedule_payment"/>
+                
+        <setColumnRemarks catalogName="schedule_payment"   
+                columnDataType="date"  
+                columnName="period_start_date"  
+                remarks="Период, за который выплачивается долг: начало периода"  
+                schemaName="public"  
+                tableName="schedule_payment"/>
+                
+        <setColumnRemarks catalogName="schedule_payment"   
+                columnDataType="date"  
+                columnName="period_end_date"  
+                remarks="Период, за который выплачивается долг: конец периода"  
+                schemaName="public"  
+                tableName="schedule_payment"/>
+                
+        <setColumnRemarks catalogName="schedule_payment"   
+                columnDataType="decimal"  
+                columnName="principal_payment"  
+                remarks="Сумма выплаты для погашения тела долга"  
+                schemaName="public"  
+                tableName="schedule_payment"/>
+                
+        <setColumnRemarks catalogName="schedule_payment"   
+                columnDataType="decimal"  
+                columnName="interest_payment"  
+                remarks="Сумма выплаты для погашения процентов по долгу"  
+                schemaName="public"  
+                tableName="schedule_payment"/>
+                
+        <setColumnRemarks catalogName="schedule_payment"   
+                columnDataType="int"  
+                columnName="payment_order"  
+                remarks="Порядковый номер платежа в рамках договора"  
+                schemaName="public"  
+                tableName="schedule_payment"/>
+                
+        <setColumnRemarks catalogName="schedule_payment"   
+                columnDataType="varchar"  
+                columnName="status"  
+                remarks="Статус платежа (оплаченный, просроченный, еще не оплаченный)"  
+                schemaName="public"  
+                tableName="schedule_payment"/>
+                
+    </changeSet>
+    
+</databaseChangeLog>

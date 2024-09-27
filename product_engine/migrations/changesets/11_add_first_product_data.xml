@@ -1,0 +1,27 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-latest.xsd">
+    
+    <changeSet author="alozovskaya" id="addFirstProductData">
+         <insert tableName="product">
+            <column name="client_friendly_name" value="Cash Loan"/>
+            <column name="internal_code" value="CL_1.0"/>
+            <column name="min_loan_term" value="3"/>
+            <column name="max_loan_term" value="24"/>
+            <column name="min_principal_amount" value="50000"/>
+            <column name="max_principal_amount" value="500000"/>
+            <column name="min_interest_rate" value="8"/>
+            <column name="max_interest_rate" value="15"/>
+            <column name="min_origination_amount" value="2000"/>
+            <column name="max_origination_amount" value="10000"/>
+        </insert>
+    </changeSet>
+
+    
+</databaseChangeLog>
