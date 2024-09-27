@@ -60,7 +60,7 @@ class ApplicationCBV:
 
 
     # Create a new application
-    @router.post("/", response_model=ApplicationResponse, summary="Create an application", description="Validates product data, sends an application to Scoring service.")
+    @router.post("/", response_model=ApplicationResponse, summary="Create an application", description="Validates product data, sends an application to Scoring service.", status_code=status.HTTP_201_CREATED)
     async def create_application(self, application: ApplicationRequest, background_tasks: BackgroundTasks) -> ApplicationResponse:
         # Validate product data -- commented as the request should be from PR service, we assume all data was checked
         

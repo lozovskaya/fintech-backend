@@ -1,10 +1,12 @@
+import json
 import random
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi_utils.cbv import cbv
 
-from dependencies import get_origination_client, get_repo_dep
-from models.schemas import AgreementModel, AgreementRequest, ApplicationRequest
+from dependencies import get_kafka_producer, get_origination_client, get_repo_dep, get_settings
+from common.kafka.producer_manager import KafkaProducer
+from models.schemas import AgreementModel, AgreementRequest, ApplicationRequest, KafkaProducerNewAgreementMessage
 from cruds import crud_agreements, crud_products, crud_clients
 from datetime import datetime
 
@@ -39,6 +41,7 @@ class AgreementCBV:
     repo_client: ClientRepository = Depends(get_repo_dep(Client))
     repo: AgreementRepository = Depends(get_repo_dep(Agreement))
     origination_client : OriginationClient = Depends(get_origination_client)
+    kafka_producer : KafkaProducer = Depends(get_kafka_producer)
 
     # Creates a new agreement
     @router.post("/", response_model=int, summary="Create a new agreement", description="Validate credit terms, creates a new client if non-existent before, creates a new agreement.", status_code=status.HTTP_201_CREATED)
@@ -79,16 +82,12 @@ class AgreementCBV:
                                                                 status=AgreementStatus.NEW.name,
                                                                 disbursement_amount=agreement.disbursement_amount))
         
-        # Send it to Origination
-        response = self.origination_client.post_application(ApplicationRequest( client_id=client_id,
-                                                                                product_id=product.product_id,
-                                                                                disbursement_amount=agreement.disbursement_amount,
-                                                                                term=agreement.term,
-                                                                                interest=agreement.interest))
-        if not response:
-            details = {
-                "message": "Error: the application in Origination has not been created",
-                "agreement_id": new_agreement.agreement_id,
-                }
-            return {"details": details}
+        # Send it to Kafka
+        topicname = get_settings().kafka_topic_agreement
+        await self.kafka_producer.send_message(topicname, KafkaProducerNewAgreementMessage( agreement_id=new_agreement.agreement_id,
+                                                                                            client_id=client_id,
+                                                                                            product_id=product.product_id,
+                                                                                            disbursement_amount=agreement.disbursement_amount,
+                                                                                            term=agreement.term,
+                                                                                            interest=agreement.interest))
         return new_agreement.agreement_id

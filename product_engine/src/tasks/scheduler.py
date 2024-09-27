@@ -13,7 +13,6 @@ import logging
 
 from models.models import Agreement
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class TasksScheduler(metaclass=SingletonMeta):

@@ -1,6 +1,10 @@
+import asyncio
 from collections.abc import Callable, Coroutine
 from functools import lru_cache
+import logging
 from typing import Any
+from common.kafka.create_config import create_kafka_config_from_settings
+from common.kafka.consumer_manager import KafkaConsumer
 from models import database
 from clients.scoring_client import ScoringClient
 
@@ -29,8 +33,21 @@ def get_task_scheduler():
     return TasksScheduler(scoring_client=get_scoring_client(), get_repo=get_repo)
 
 
+@lru_cache
+def get_kafka_config():
+    config = create_kafka_config_from_settings(get_settings())
+    config["loop"] = loop
+    config["group_id"] = get_settings().group_id
+    return config
+    
+loop = asyncio.get_event_loop()
+
+kafka_consumer = KafkaConsumer(get_kafka_config())
+
 engine = database.get_engine(create_db_url_from_settings(get_settings()))
 
 get_repo_dep: Callable[[AsyncSession], DatabaseRepository] = get_repository_callable(engine, Application)
     
 MIN_TIME_BETWEEN_APPLICATIONS_IN_SEC = get_settings().min_time_between_applications_in_sec
+
+logging.basicConfig(level=logging.INFO)

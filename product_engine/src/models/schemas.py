@@ -55,3 +55,12 @@ class ApplicationRequest(BaseModel):
     disbursement_amount: float
     term: int
     interest: float
+    
+    
+class KafkaProducerNewAgreementMessage(BaseModel):
+    agreement_id : int
+    client_id : int
+    product_id : int
+    disbursement_amount: float
+    term: int
+    interest: float

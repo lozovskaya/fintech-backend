@@ -12,7 +12,6 @@ from common.libs.metaclasses import SingletonMeta
 from models import enums
 from models.schemas import ApplicationRequestToScoring
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class TasksScheduler(metaclass=SingletonMeta):
