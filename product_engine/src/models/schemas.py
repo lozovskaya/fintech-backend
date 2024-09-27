@@ -45,6 +45,7 @@ class AgreementRequest(BaseModel):
     interest: float
     disbursement_amount: float
 
+
 class AgreementResponse(BaseModel):
     agreement_id: int
     
@@ -55,6 +56,7 @@ class ApplicationRequest(BaseModel):
     disbursement_amount: float
     term: int
     interest: float
+    agreement_id: int
     
     
 class KafkaProducerNewAgreementMessage(BaseModel):

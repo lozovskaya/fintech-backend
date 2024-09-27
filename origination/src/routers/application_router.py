@@ -1,11 +1,11 @@
 from typing import Annotated
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
-import requests
 
-from dependencies import get_repo_dep, MIN_TIME_BETWEEN_APPLICATIONS_IN_SEC, get_scoring_client, get_task_scheduler
+from dependencies import get_kafka_producer_scoring_request, get_repo_dep, MIN_TIME_BETWEEN_APPLICATIONS_IN_SEC, get_scoring_client, get_settings, get_task_scheduler
+from common.kafka.producer_manager import KafkaProducer
 from models.models import Application
 from models import enums
-from models.schemas import ApplicationRequest, ApplicationResponse, ApplicationRequestToScoring
+from models.schemas import ApplicationKafkaRequestToScoring, ApplicationRequest, ApplicationResponse
 from cruds import crud_applications
 from fastapi_utils.cbv import cbv
 
@@ -13,7 +13,6 @@ import datetime
 
 from clients.scoring_client import ScoringClient
 from common.repo.repository import DatabaseRepository
-from common.settings.urls import PRODUCT_ENGINE_URL
 from tasks.scheduler import TasksScheduler
 
 router = APIRouter(
@@ -31,18 +30,12 @@ class ApplicationCBV:
     repo: ApplicationRepository = Depends(get_repo_dep)
     scheduler: TasksScheduler = Depends(get_task_scheduler)
     scoring_client: ScoringClient = Depends(get_scoring_client)
+    kafka_producer_scoring_request : KafkaProducer = Depends(get_kafka_producer_scoring_request)
 
     async def send_application_to_scoring(self, application: Application) -> None:
-        response = self.scoring_client.send_application_for_scoring(application=ApplicationRequestToScoring(application_id=application.application_id,
-                                                                                                            client_id=application.client_id,
-                                                                                                            product_id=application.product_id,
-                                                                                                            disbursement_amount=application.disbursement_amount,
-                                                                                                            term=application.term,
-                                                                                                            interest=application.interest))
-        if response:
-            scoring_id = response["scoring_id"]
-            await crud_applications.update_status_of_application(self.repo, application.application_id, enums.ApplicationStatus.PENDING)
-            self.scheduler.schedule_scoring_status_check(application.application_id, scoring_id)
+         await self.kafka_producer_scoring_request.send_message(get_settings().kafka_topic_scoring_request,
+                                                                ApplicationKafkaRequestToScoring(agreement_id=1, 
+                                                                                                 client_id=application.client_id))
 
 
 
@@ -89,7 +82,8 @@ class ApplicationCBV:
                                                 "term": application.term,
                                                 "interest": application.interest,
                                                 "status": enums.ApplicationStatus.CREATED.name,
-                                                "timestamp": datetime.datetime.now()})
+                                                "timestamp": datetime.datetime.now(),
+                                                "agreement_id": application.agreement_id})
         
         # Send a request to Scoring service as a background task
         application = await crud_applications.get_application_by_id(self.repo, application_id)

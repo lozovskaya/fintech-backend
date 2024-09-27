@@ -15,3 +15,4 @@ class Application(Base):
     interest = Column(Float)
     status = Column(String)
     timestamp = Column(DateTime)
+    agreement_id = Column(Integer)

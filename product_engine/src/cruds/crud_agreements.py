@@ -21,6 +21,12 @@ async def get_all_agreements_by_status(repo: DatabaseRepository, status: Agreeme
     return agreements
 
 
+async def get_all_active_agreements_by_client_id(repo: DatabaseRepository, client_id: int) -> List[Agreement]:
+    agreements = await repo.filter(Agreement.client_id == client_id, Agreement.status != AgreementStatus.CLOSED.name)
+    if not agreements:
+        return None
+    return agreements
+
 async def get_all_agreements(repo: DatabaseRepository) -> List[Agreement]:
     agreements = await repo.filter()
     if not agreements:

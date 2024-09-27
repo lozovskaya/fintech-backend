@@ -7,6 +7,7 @@ class ApplicationRequest(BaseModel):
     disbursement_amount: float
     term: int
     interest: float
+    agreement_id: int
     
 class ApplicationModel(BaseModel):
     client_id : int
@@ -28,3 +29,8 @@ class ApplicationRequestToScoring(BaseModel):
     disbursement_amount: float
     term: int
     interest: float
+    
+
+class ApplicationKafkaRequestToScoring(BaseModel):
+    agreement_id : int
+    client_id : int

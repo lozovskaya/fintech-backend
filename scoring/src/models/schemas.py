@@ -8,3 +8,7 @@ class ApplicationRequest(BaseModel):
     disbursement_amount: float
     term: int
     interest: float
+    
+class KafkaProducerScoringResponseMessage(BaseModel):
+    agreement_id : int
+    scoring_result : str

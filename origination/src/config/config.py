@@ -14,6 +14,8 @@ class OriginationSettings(BaseSettings):
     
     # Kafka config:
     kafka_topic_agreement : str
+    kafka_topic_scoring_request : str
+    kafka_topic_scoring_response : str
     kafka_host : str
     kafka_port : str
     group_id : str
