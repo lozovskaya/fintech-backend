@@ -1,0 +1,59 @@
+@startuml
+actor Client
+participant Browser
+participant API
+participant Origination
+participant ProductEngine as PE
+participant Scoring
+participant Database
+
+Client -> Browser: Click "Submit Application"
+Browser -> API: Create Application Request
+API -> Origination: POST /application
+Origination -> PE: Validate Product Data
+PE --> Origination: Valid Data (200 OK)
+
+Origination -> Database: Save Application with Status PENDING
+Origination -> Scoring: Send Application for Scoring
+
+activate Scoring
+Scoring --> Origination: Scoring Result
+deactivate Scoring
+
+alt Scoring Approved
+    Origination -> PE: Create Agreement
+    PE --> Origination: Agreement ID
+    Origination -> Database: Update Application Status to CREATED
+else Scoring Rejected
+    Origination -> Database: Update Application Status to REJECTED
+end
+
+Origination --> API: Application Created (200 OK with application_id)
+API --> Browser: Application Created Response 
+
+Browser --> Client: Display Application Created Message
+
+== Check Application Status ==
+Client -> Browser: Check Status
+Browser -> API: GET /application/{application_id}
+API -> Origination: Get Application Status
+Origination -> Database: Fetch Application Status
+Database --> Origination: Application Status
+Origination --> API: Application Status
+API --> Browser: Application Status Response
+Browser --> Client: Display Application Status
+
+== Cancel Application ==
+Client -> Browser: Cancel Application
+Browser -> API: POST /application/{application_id}/close
+API -> Origination: Close Application Request
+alt Application in PENDING
+    Origination -> Scoring: Cancel Scoring
+    Scoring --> Origination: Scoring Canceled
+end
+Origination -> Database: Update Application Status to CANCELLED
+Origination --> API: Application Closed (200 OK)
+API --> Browser: Application Closed Response
+Browser --> Client: Display Application Closed Message
+
+@enduml
