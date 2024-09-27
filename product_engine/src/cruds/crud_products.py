@@ -2,8 +2,8 @@ from typing import List
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from src.models.schemas import ProductModel
-from src.models.models import Product
+from models.schemas import ProductModel
+from models.models import Product
 
 
 def get_product_by_internal_code(db: Session, product_code: str) -> Product:

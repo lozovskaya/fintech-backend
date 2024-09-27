@@ -2,8 +2,8 @@ from typing import List
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from src.models.schemas import AgreementModel
-from src.models.models import Agreement
+from models.schemas import AgreementModel
+from models.models import Agreement
 
 
 
